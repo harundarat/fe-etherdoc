@@ -58,7 +58,12 @@ export default function LoginPage() {
         throw new Error(errorData.message || "Login failed. Please try again.");
       }
 
-      // 4. Redirect to dashboard
+      // 4. save access token to local storage
+      const data = await loginRes.json();
+      localStorage.setItem("etherdoc-auth", data.accessToken);
+      console.info(`accessToken: ${data.accessToken}`);
+
+      // 5. Redirect to dashboard
       router.push("/dashboard");
     } catch (err: any) {
       console.error("Authentication error:", err);

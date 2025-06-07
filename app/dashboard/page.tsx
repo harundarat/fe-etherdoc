@@ -2,13 +2,15 @@
 
 import { useAccount } from "wagmi";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import Sidebar from "../components/Sidebar";
+import DocumentsContent from "../components/DocumentsContent";
 import { useAppKit } from "@reown/appkit/react";
 
 export default function DashboardPage() {
   const { address, isConnected } = useAccount();
-  const { open } = useAppKit();
   const router = useRouter();
+  const [activeSection, setActiveSection] = useState("documents");
 
   useEffect(() => {
     if (!isConnected) {
@@ -21,19 +23,16 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold mb-4">
-          Welcome to VeriDoc Dashboard
-        </h1>
-        <p className="text-gray-600 mb-4">Connected with: {address}</p>
-        <button
-          onClick={() => open()}
-          className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg"
-        >
-          Disconnect Wallet
-        </button>
-      </div>
+    <div className="flex h-screen bg-gray-50">
+      <Sidebar
+        activeSection={activeSection}
+        setActiveSection={setActiveSection}
+        userAddress={address}
+      />
+
+      <main className="flex-1 overflow-hidden">
+        {activeSection === "documents" && <DocumentsContent />}
+      </main>
     </div>
   );
 }
