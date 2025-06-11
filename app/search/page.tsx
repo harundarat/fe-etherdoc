@@ -91,30 +91,30 @@ export default function SearchPage() {
     setSearchResult(null);
   };
 
-  const handleSearch = async (e: FormEvent) => {
-    e.preventDefault();
-    if (activeTab !== "search" || !searchQuery) return;
+  const handleFileVerification = async () => {
+    if (!selectedFile) {
+      setError("Please select a file to verify");
+      return;
+    }
 
     resetState();
 
     try {
+      const formData = new FormData();
+      formData.append("file", selectedFile);
+
       const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
-      const url = `${API_BASE_URL}/documents/${searchQuery}?network=private`;
+      const url = `${API_BASE_URL}/documents/search`;
+      console.info("Uploading file to url: ", url);
 
-      console.info("Requesting URL: ", url);
-
+      // send request to API
       const response = await fetch(url, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        method: "POST",
+        body: formData,
       });
 
-      // Handle response
       if (response.ok) {
-        const result = await response.json();
-        const document = result.data;
-
+        const document = await response.json();
         const documentData: SearchResult = {
           id: document.id,
           name: document.name,
@@ -124,33 +124,98 @@ export default function SearchPage() {
           createdAt: document.created_at,
           isValid: true,
         };
-
-        // Update UI
         setSearchResult(documentData);
       } else {
-        // Handle errors based on status code
+        // Error handling
         if (response.status === 404) {
-          setError("Document with that ID was not found on the blockchain.");
+          setError(
+            "This document was not found in our system. It might not be registered"
+          );
+        } else if (response.status === 422) {
+          setError("File is too large. The maximum allowed size is 5MB");
         } else {
           const errorData = await response.json().catch(() => {
-            return { message: "An unexpected error occured." };
+            message: "An unexpected error occured while verifying the file.";
           });
-
-          setError(errorData.message || `Error: ${response.statusText}`);
+          setError(errorData.message);
         }
-
-        // Reset search result if error occurs
         setSearchResult(null);
       }
-
-      console.info("API Response Status: ", response.status);
     } catch (error) {
-      console.error("Fetch error: ", error);
+      console.error("File upload error: ", error);
       setError(
-        "Failed to connect to the server. Please check your connection."
+        "Failed to connect to the server. Please check your connection and try again."
       );
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleSearch = async (e: FormEvent) => {
+    e.preventDefault();
+
+    if (activeTab === "search") {
+      if (!searchQuery) return;
+
+      resetState();
+
+      try {
+        const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+        const url = `${API_BASE_URL}/documents/${searchQuery}?network=private`;
+
+        console.info("Requesting URL: ", url);
+
+        const response = await fetch(url, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        // Handle response
+        if (response.ok) {
+          const result = await response.json();
+          const document = result.data;
+
+          const documentData: SearchResult = {
+            id: document.id,
+            name: document.name,
+            cid: document.cid,
+            size: document.size,
+            issuer: document.keyvalues?.instansi || "N/A",
+            createdAt: document.created_at,
+            isValid: true,
+          };
+
+          // Update UI
+          setSearchResult(documentData);
+        } else {
+          // Handle errors based on status code
+          if (response.status === 404) {
+            setError("Document with that ID was not found on the blockchain.");
+          } else {
+            const errorData = await response.json().catch(() => {
+              return { message: "An unexpected error occured." };
+            });
+
+            setError(errorData.message || `Error: ${response.statusText}`);
+          }
+
+          // Reset search result if error occurs
+          setSearchResult(null);
+        }
+
+        console.info("API Response Status: ", response.status);
+      } catch (error) {
+        console.error("Fetch error: ", error);
+        setError(
+          "Failed to connect to the server. Please check your connection."
+        );
+      } finally {
+        setIsLoading(false);
+      }
+    } else if (activeTab === "upload") {
+      handleFileVerification();
     }
   };
 
