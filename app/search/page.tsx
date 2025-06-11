@@ -6,13 +6,14 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import Link from "next/link";
 
-// Placeholder untuk tipe data hasil pencarian
 type SearchResult = {
   id: string;
   name: string;
+  cid: string;
+  size: number;
   issuer: string;
-  timestamp: string;
-  transactionHash: string;
+  createdAt: string;
+
   isValid: boolean;
 };
 
@@ -91,47 +92,132 @@ export default function SearchPage() {
     setSearchResult(null);
   };
 
-  const handleSearch = async (e: FormEvent) => {
-    e.preventDefault();
-    if (activeTab === "search" && !searchQuery) return;
-    if (activeTab === "upload" && !selectedFile) return;
+  const handleFileVerification = async () => {
+    if (!selectedFile) {
+      setError("Please select a file to verify");
+      return;
+    }
 
     resetState();
 
-    // Simulasi API call
-    if (activeTab === "search") {
-      console.log("Searching for:", searchQuery);
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      if (searchQuery === "12345" || searchQuery.includes("0x")) {
-        setSearchResult({
-          id: "12345",
-          name: "Sertifikat Kelulusan.pdf",
-          issuer: "0x123...abc",
-          timestamp: new Date().toISOString(),
-          transactionHash: "0xabc...123",
-          isValid: true,
-        });
-      } else {
-        setError("Document not found on blockchain.");
-      }
-    } else if (activeTab === "upload" && selectedFile) {
-      console.log("Verifying file:", selectedFile.name);
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      if (selectedFile.name.includes("Sertifikat")) {
-        setSearchResult({
-          id: "67890",
-          name: selectedFile.name,
-          issuer: "0x456...def",
-          timestamp: new Date().toISOString(),
-          transactionHash: "0xdef...456",
-          isValid: true,
-        });
-      } else {
-        setError("This document is not registered on the blockchain.");
-      }
-    }
+    try {
+      const formData = new FormData();
+      formData.append("file", selectedFile);
 
-    setIsLoading(false);
+      const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+      const url = `${API_BASE_URL}/documents/search`;
+      console.info("Uploading file to url: ", url);
+
+      // send request to API
+      const response = await fetch(url, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (response.ok) {
+        const document = await response.json();
+        const documentData: SearchResult = {
+          id: document.id,
+          name: document.name,
+          cid: document.cid,
+          size: document.size,
+          issuer: document.keyvalues?.instansi || "N/A",
+          createdAt: document.created_at,
+          isValid: true,
+        };
+        setSearchResult(documentData);
+      } else {
+        // Error handling
+        if (response.status === 404) {
+          setError(
+            "This document was not found in our system. It might not be registered"
+          );
+        } else if (response.status === 422) {
+          setError("File is too large. The maximum allowed size is 5MB");
+        } else {
+          const errorData = await response.json().catch(() => {
+            message: "An unexpected error occured while verifying the file.";
+          });
+          setError(errorData.message);
+        }
+        setSearchResult(null);
+      }
+    } catch (error) {
+      console.error("File upload error: ", error);
+      setError(
+        "Failed to connect to the server. Please check your connection and try again."
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSearch = async (e: FormEvent) => {
+    e.preventDefault();
+
+    if (activeTab === "search") {
+      if (!searchQuery) return;
+
+      resetState();
+
+      try {
+        const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+        const url = `${API_BASE_URL}/documents/${searchQuery}?network=private`;
+
+        console.info("Requesting URL: ", url);
+
+        const response = await fetch(url, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        // Handle response
+        if (response.ok) {
+          const result = await response.json();
+          const document = result.data;
+
+          const documentData: SearchResult = {
+            id: document.id,
+            name: document.name,
+            cid: document.cid,
+            size: document.size,
+            issuer: document.keyvalues?.instansi || "N/A",
+            createdAt: document.created_at,
+            isValid: true,
+          };
+
+          // Update UI
+          setSearchResult(documentData);
+        } else {
+          // Handle errors based on status code
+          if (response.status === 404) {
+            setError("Document with that ID was not found on the blockchain.");
+          } else {
+            const errorData = await response.json().catch(() => {
+              return { message: "An unexpected error occured." };
+            });
+
+            setError(errorData.message || `Error: ${response.statusText}`);
+          }
+
+          // Reset search result if error occurs
+          setSearchResult(null);
+        }
+
+        console.info("API Response Status: ", response.status);
+      } catch (error) {
+        console.error("Fetch error: ", error);
+        setError(
+          "Failed to connect to the server. Please check your connection."
+        );
+      } finally {
+        setIsLoading(false);
+      }
+    } else if (activeTab === "upload") {
+      handleFileVerification();
+    }
   };
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -214,7 +300,7 @@ export default function SearchPage() {
                 : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-300"
             }`}
           >
-            Search on chain
+            Search by ID
           </button>
           <button
             onClick={() => setActiveTab("upload")}
@@ -366,7 +452,7 @@ export default function SearchPage() {
                   </div>
                   <div>
                     <label className="text-sm font-medium text-gray-500">
-                      Issuer Address
+                      Issuer
                     </label>
                     <p className="mt-1 text-gray-900 font-mono bg-gray-50 p-2 rounded">
                       {searchResult.issuer}
@@ -380,14 +466,15 @@ export default function SearchPage() {
                       {new Date(searchResult.timestamp).toLocaleString()}
                     </p>
                   </div>
-                  <div className="md:col-span-2">
+                  {/* <div className="md:col-span-2">
+
                     <label className="text-sm font-medium text-gray-500">
                       Transaction Hash
                     </label>
                     <p className="mt-1 text-gray-900 font-mono bg-gray-50 p-3 rounded break-all">
                       {searchResult.transactionHash}
                     </p>
-                  </div>
+                  </div> */}
                 </div>
 
                 {searchResult.isValid && (
