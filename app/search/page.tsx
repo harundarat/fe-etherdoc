@@ -13,6 +13,7 @@ type SearchResult = {
   size: number;
   issuer: string;
   createdAt: string;
+
   isValid: boolean;
 };
 
@@ -466,6 +467,7 @@ export default function SearchPage() {
                     </p>
                   </div>
                   {/* <div className="md:col-span-2">
+
                     <label className="text-sm font-medium text-gray-500">
                       Transaction Hash
                     </label>
