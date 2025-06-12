@@ -21,44 +21,11 @@ interface ApiResponse {
   };
 }
 
-// Sample data
-// const sampleDocuments = [
-//   {
-//     id: "1",
-//     name: "Contract Agreement.pdf",
-//     status: "completed",
-//     lastModified: "August 15, 2023",
-//     type: "pdf",
-//   },
-//   {
-//     id: "2",
-//     name: "Invoice #2023-001.docx",
-//     status: "pending",
-//     lastModified: "August 10, 2023",
-//     type: "docx",
-//   },
-//   {
-//     id: "3",
-//     name: "Meeting Minutes_Internal.txt",
-//     status: "draft",
-//     lastModified: "August 05, 2023",
-//     type: "txt",
-//   },
-//   {
-//     id: "4",
-//     name: "Project Proposal_Final.pdf",
-//     status: "completed",
-//     lastModified: "July 20, 2023",
-//     type: "pdf",
-//   },
-//   {
-//     id: "5",
-//     name: "Expense Report_Q2.xlsx",
-//     status: "submitted",
-//     lastModified: "July 10, 2023",
-//     type: "xlsx",
-//   },
-// ];
+interface DocumentsContentProps {
+  onUploadClick: () => void;
+  isUploadPopupOpen: boolean;
+  onCloseUpload: () => void;
+}
 
 // Icons
 const SearchIcon = ({ className }: { className?: string }) => (
@@ -131,7 +98,14 @@ const EditIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-export default function DocumentsContent() {
+export default function DocumentsContent({
+  onUploadClick,
+  isUploadPopupOpen,
+  onCloseUpload,
+}: DocumentsContentProps) {
+  console.info("DocumentsContent Rendered");
+  console.info("onUploadClick: ", onUploadClick);
+
   const [activeTab, setActiveTab] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -262,7 +236,13 @@ export default function DocumentsContent() {
       <div className="bg-white border-b border-gray-200 px-8 py-6">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-gray-900">Documents</h1>
-          <button className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+          <button
+            onClick={() => {
+              console.info("upload button clicked");
+              onUploadClick();
+            }}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors cursor-pointer"
+          >
             <UploadIcon className="w-4 h-4" />
             Upload Document
           </button>
