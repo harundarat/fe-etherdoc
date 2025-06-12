@@ -463,7 +463,7 @@ export default function SearchPage() {
                       Timestamp
                     </label>
                     <p className="mt-1 text-gray-900">
-                      {new Date(searchResult.timestamp).toLocaleString()}
+                      {new Date(searchResult.createdAt).toLocaleString()}
                     </p>
                   </div>
                   {/* <div className="md:col-span-2">
