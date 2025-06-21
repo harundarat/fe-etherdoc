@@ -130,14 +130,14 @@ export default function SearchPage() {
         // Error handling
         if (response.status === 404) {
           setError(
-            "This document was not found in our system. It might not be registered"
+            "This document was not found in our system. It might not be registered",
           );
         } else if (response.status === 422) {
           setError("File is too large. The maximum allowed size is 5MB");
         } else {
-          const errorData = await response.json().catch(() => {
-            message: "An unexpected error occured while verifying the file.";
-          });
+          const errorData = await response.json().catch(() => ({
+            message: "An unexpected error occured while verifying the file.",
+          }));
           setError(errorData.message);
         }
         setSearchResult(null);
@@ -145,7 +145,7 @@ export default function SearchPage() {
     } catch (error) {
       console.error("File upload error: ", error);
       setError(
-        "Failed to connect to the server. Please check your connection and try again."
+        "Failed to connect to the server. Please check your connection and try again.",
       );
     } finally {
       setIsLoading(false);
@@ -210,7 +210,7 @@ export default function SearchPage() {
       } catch (error) {
         console.error("Fetch error: ", error);
         setError(
-          "Failed to connect to the server. Please check your connection."
+          "Failed to connect to the server. Please check your connection.",
         );
       } finally {
         setIsLoading(false);

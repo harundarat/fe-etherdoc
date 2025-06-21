@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAccount, useSignMessage } from "wagmi";
 import { useAppKit } from "@reown/appkit/react";
-import Image from "next/image";
 
 export default function LoginPage() {
   const { open } = useAppKit();
@@ -28,7 +27,7 @@ export default function LoginPage() {
     try {
       // 1. Get nonce from server
       const nonceRes = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/auth/nonce`
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/nonce`,
       );
       if (!nonceRes.ok) {
         throw new Error("Failed to fetch message from server.");
@@ -50,7 +49,7 @@ export default function LoginPage() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ signature }),
-        }
+        },
       );
 
       if (!loginRes.ok) {
@@ -65,9 +64,11 @@ export default function LoginPage() {
 
       // 5. Redirect to dashboard
       router.push("/dashboard");
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Authentication error:", err);
-      setError(err.message || "An unexpected error occurred.");
+      setError(
+        err instanceof Error ? err.message : "An unexpected error occurred.",
+      );
       setIsLoading(false);
     }
   };
