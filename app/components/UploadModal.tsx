@@ -1,10 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
+import { toast } from "react-hot-toast";
 
 interface UploadModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onUploadSuccess?: () => void;
 }
 
 const CloseIcon = ({ className }: { className?: string }) => (
@@ -39,10 +41,15 @@ const UploadIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-export default function UploadModal({ isOpen, onClose }: UploadModalProps) {
+export default function UploadModal({
+  isOpen,
+  onClose,
+  onUploadSuccess,
+}: UploadModalProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   if (!isOpen) return null;
 
@@ -82,6 +89,7 @@ export default function UploadModal({ isOpen, onClose }: UploadModalProps) {
     if (!selectedFile) return;
 
     setIsUploading(true);
+    setUploadProgress(0);
 
     try {
       const formData = new FormData();
@@ -91,6 +99,17 @@ export default function UploadModal({ isOpen, onClose }: UploadModalProps) {
       const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
       const token = localStorage.getItem("etherdoc-auth");
 
+      // Simulate upload progress
+      const progressInterval = setInterval(() => {
+        setUploadProgress((prev) => {
+          if (prev >= 90) {
+            clearInterval(progressInterval);
+            return 90;
+          }
+          return prev + 10;
+        });
+      }, 200);
+
       const response = await fetch(`${API_BASE_URL}/documents`, {
         method: "POST",
         headers: {
@@ -99,20 +118,40 @@ export default function UploadModal({ isOpen, onClose }: UploadModalProps) {
         body: formData,
       });
 
+      clearInterval(progressInterval);
+      setUploadProgress(100);
+
       if (response.ok) {
-        console.info("Upload successful!");
-        alert("File uploaded successfully!");
+        const result = await response.json();
+        console.info("Upload successful!", result);
+
+        // Simple success notification
+        toast.success(
+          `File uploaded successfully! Document ID: ${result.data?.id || "Generated"}`,
+        );
+
         setSelectedFile(null);
+        setUploadProgress(0);
         onClose();
+
+        // Trigger refresh callback if provided
+        if (onUploadSuccess) {
+          onUploadSuccess();
+        }
       } else {
         console.error("Upload failed");
-        alert("Upload failed. Please try again");
+        const errorData = await response.json().catch(() => ({
+          message: "Upload failed. Please try again.",
+        }));
+
+        toast.error(errorData.message || "Upload failed. Please try again.");
       }
     } catch (error) {
       console.error("Upload error: ", error);
-      alert("Upload error. Please try again.");
+      toast.error("Upload error. Please try again.");
     } finally {
       setIsUploading(false);
+      setUploadProgress(0);
     }
   };
 
@@ -120,56 +159,95 @@ export default function UploadModal({ isOpen, onClose }: UploadModalProps) {
     <div className="fixed inset-0 z-50 overflow-y-auto">
       {/* Backdrop */}
       <div
-        className="fixed inset-0 bg-white/20 backdrop-blur-sm transition-opacity"
+        className="fixed inset-0 bg-gray-900/80 backdrop-blur-md transition-all duration-300"
         onClick={onClose}
       ></div>
 
       {/* Modal */}
       <div className="flex min-h-full items-center justify-center p-4">
-        <div className="relative bg-white rounded-lg shadow-xl max-w-md w-full">
+        <div className="relative bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl max-w-lg w-full border border-white/20 transform transition-all duration-300 scale-100">
           {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b">
-            <h3 className="text-lg font-medium text-gray-900">
-              Upload Document
-            </h3>
+          <div className="flex items-center justify-between p-8 border-b border-gray-200/50">
+            <div>
+              <h3 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+                Upload Document
+              </h3>
+              <p className="text-gray-600 text-sm mt-1">
+                Secure your document on the blockchain
+              </p>
+            </div>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600"
+              className="text-gray-400 hover:text-gray-600 p-2 hover:bg-gray-100 rounded-xl transition-all duration-200"
             >
               <CloseIcon className="w-6 h-6" />
             </button>
           </div>
 
           {/* Content */}
-          <div className="p-6">
+          <div className="p-8">
             {/* Drag & Drop Area */}
             <div
               onDrop={handleDrop}
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
-              className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
+              className={`border-2 border-dashed rounded-2xl p-10 text-center transition-all duration-300 ${
                 isDragOver
-                  ? "border-blue-500 bg-blue-50"
-                  : "border-gray-300 hover:border-gray-400"
+                  ? "border-blue-500 bg-gradient-to-br from-blue-50 to-indigo-50 scale-105"
+                  : "border-gray-300 hover:border-blue-400 hover:bg-gradient-to-br hover:from-gray-50 hover:to-blue-50"
               }`}
             >
-              <UploadIcon className="w-12 h-12 mx-auto text-gray-400 mb-4"></UploadIcon>
+              <div
+                className={`w-16 h-16 mx-auto mb-6 rounded-2xl flex items-center justify-center transition-all duration-300 ${
+                  isDragOver
+                    ? "bg-gradient-to-r from-blue-500 to-blue-600 shadow-lg"
+                    : "bg-gradient-to-r from-gray-100 to-gray-200"
+                }`}
+              >
+                <UploadIcon
+                  className={`w-8 h-8 transition-colors ${
+                    isDragOver ? "text-white" : "text-gray-500"
+                  }`}
+                ></UploadIcon>
+              </div>
 
               {selectedFile ? (
-                <div>
-                  <p className="text-sm font-medium text-gray-900 mb-1">
-                    File Selected:
+                <div className="space-y-3">
+                  <div className="w-12 h-12 mx-auto bg-gradient-to-r from-green-100 to-green-200 rounded-xl flex items-center justify-center mb-4">
+                    <svg
+                      className="w-6 h-6 text-green-600"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                  </div>
+                  <p className="text-lg font-semibold text-gray-900 mb-2">
+                    File Ready to Upload
                   </p>
-                  <p className="text-sm text-gray-500">{selectedFile.name}</p>
-                  <p className="text-xs text-gray-400 mt-1">
-                    Size: {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
-                  </p>
+                  <div className="bg-white/80 backdrop-blur-sm rounded-xl p-4 border border-gray-200">
+                    <p className="font-medium text-gray-900">
+                      {selectedFile.name}
+                    </p>
+                    <p className="text-sm text-gray-500 mt-1">
+                      Size: {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
+                    </p>
+                  </div>
                 </div>
               ) : (
-                <div>
-                  <p className="text-sm font-medium text-gray-900 mb-1">
+                <div className="space-y-4">
+                  <h4 className="text-xl font-semibold text-gray-900">
+                    Upload Your Document
+                  </h4>
+                  <p className="text-gray-600">
                     Drop your file here, or{" "}
-                    <label className="text-blue-600 hover:text-blue-500 cursor-pointer">
+                    <label className="text-blue-600 hover:text-blue-700 cursor-pointer font-semibold underline underline-offset-2">
                       browse
                       <input
                         type="file"
@@ -179,26 +257,126 @@ export default function UploadModal({ isOpen, onClose }: UploadModalProps) {
                       />
                     </label>
                   </p>
-                  <p className="text-xs text-gray-500">Supports: PDF, PNG</p>
+                  <div className="flex items-center justify-center gap-4 text-xs text-gray-500">
+                    <span className="flex items-center gap-1">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      PDF
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                      PNG
+                    </span>
+                  </div>
                 </div>
               )}
             </div>
 
+            {/* Progress Bar */}
+            {isUploading && (
+              <div className="mt-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-200">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
+                      <svg
+                        className="w-4 h-4 text-white animate-spin"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                      </svg>
+                    </div>
+                    <span className="text-base font-semibold text-gray-800">
+                      Uploading to IPFS...
+                    </span>
+                  </div>
+                  <span className="text-lg font-bold text-blue-600">
+                    {uploadProgress}%
+                  </span>
+                </div>
+                <div className="w-full bg-white/50 rounded-full h-3 overflow-hidden">
+                  <div
+                    className="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full transition-all duration-500 ease-out shadow-sm"
+                    style={{ width: `${uploadProgress}%` }}
+                  ></div>
+                </div>
+                <p className="text-sm text-gray-600 mt-3 flex items-center gap-2">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                  {uploadProgress < 90
+                    ? "Encrypting and uploading file..."
+                    : uploadProgress === 100
+                      ? "Upload complete! Processing..."
+                      : "Storing on blockchain..."}
+                </p>
+              </div>
+            )}
+
             {/* Upload Button */}
-            <div className="mt-6 flex justify-end gap-3">
+            <div className="mt-8 flex justify-end gap-4">
               <button
                 onClick={onClose}
                 disabled={isUploading}
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+                className="px-6 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 hover:shadow-md"
               >
                 Cancel
               </button>
               <button
                 onClick={handleUpload}
                 disabled={!selectedFile || isUploading}
-                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-8 py-3 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-blue-700 border border-transparent rounded-xl hover:from-blue-700 hover:to-blue-800 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5"
               >
-                {isUploading ? "Uploading..." : "Upload"}
+                {isUploading ? (
+                  <>
+                    <svg
+                      className="animate-spin h-4 w-4 text-white"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    Uploading...
+                  </>
+                ) : (
+                  <>
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                      />
+                    </svg>
+                    Upload Document
+                  </>
+                )}
               </button>
             </div>
           </div>
