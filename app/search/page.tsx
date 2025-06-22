@@ -123,7 +123,7 @@ export default function SearchPage() {
         // Error handling
         if (response.status === 404) {
           setError(
-            "This document was not found in our system. It might not be registered"
+            "This document was not found in our system. It might not be registered",
           );
         } else if (response.status === 422) {
           setError("File is too large. The maximum allowed size is 5MB");
@@ -138,7 +138,7 @@ export default function SearchPage() {
     } catch (error) {
       console.error("File upload error: ", error);
       setError(
-        "Failed to connect to the server. Please check your connection and try again."
+        "Failed to connect to the server. Please check your connection and try again.",
       );
     } finally {
       setIsLoading(false);
@@ -193,7 +193,7 @@ export default function SearchPage() {
       } catch (error) {
         console.error("Fetch error: ", error);
         setError(
-          "Failed to connect to the server. Please check your connection."
+          "Failed to connect to the server. Please check your connection.",
         );
       } finally {
         setIsLoading(false);
@@ -374,23 +374,68 @@ export default function SearchPage() {
           </div>
         )}
 
-        {/* Results Section */}
-        {(isLoading || error || searchResult) && (
-          <div className="mt-12 max-w-4xl mx-auto">
-            {isLoading && (
-              <div className="text-center p-12 bg-white rounded-2xl shadow-sm">
-                <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto"></div>
-                <p className="mt-6 text-gray-600 text-lg">
-                  Searching on blockchain...
+        {/* Loading Popup Modal */}
+        {isLoading && (
+          <div className="fixed inset-0 backdrop-blur-sm bg-white/30 flex items-center justify-center z-50">
+            <div className="bg-white/90 backdrop-blur-lg rounded-2xl p-8 shadow-2xl max-w-md mx-4 border border-white/20">
+              <div className="text-center">
+                <div className="animate-spin rounded-full h-16 w-16 border-4 border-gray-200 border-t-blue-600 mx-auto"></div>
+                <h3 className="mt-6 text-xl font-semibold text-gray-900">
+                  {activeTab === "search"
+                    ? "Searching..."
+                    : "Verifying Document..."}
+                </h3>
+                <p className="mt-2 text-gray-600">
+                  {activeTab === "search"
+                    ? "Searching on blockchain..."
+                    : "Please wait while we verify your document on the blockchain..."}
                 </p>
               </div>
-            )}
+            </div>
+          </div>
+        )}
 
-            {error && (
-              <div className="p-8 bg-red-50 border-l-4 border-red-500 rounded-lg">
-                <p className="font-semibold text-red-800 mb-1">
+        {/* Error Popup Modal */}
+        {error && activeTab === "upload" && (
+          <div className="fixed inset-0 backdrop-blur-sm bg-white/30 flex items-center justify-center z-50">
+            <div className="bg-white/90 backdrop-blur-lg rounded-2xl p-8 shadow-2xl max-w-md mx-4 border border-white/20">
+              <div className="text-center">
+                <div className="w-16 h-16 mx-auto mb-4 bg-red-100 rounded-full flex items-center justify-center">
+                  <svg
+                    className="w-8 h-8 text-red-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-semibold text-red-800 mb-2">
                   Verification Failed
-                </p>
+                </h3>
+                <p className="text-red-700 mb-6">{error}</p>
+                <button
+                  onClick={() => setError(null)}
+                  className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-full font-medium transition-colors"
+                >
+                  Try Again
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Results Section */}
+        {(error && activeTab === "search") || searchResult ? (
+          <div className="mt-12 max-w-4xl mx-auto">
+            {error && activeTab === "search" && (
+              <div className="p-8 bg-red-50 border-l-4 border-red-500 rounded-lg">
+                <p className="font-semibold text-red-800 mb-1">Search Failed</p>
                 <p className="text-red-700">{error}</p>
               </div>
             )}
@@ -486,7 +531,7 @@ export default function SearchPage() {
               </div>
             )}
           </div>
-        )}
+        ) : null}
       </main>
     </div>
   );

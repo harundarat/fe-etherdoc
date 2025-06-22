@@ -157,7 +157,7 @@ export default function DocumentDetailPage() {
       } catch (error) {
         console.error("Fetch error:", error);
         setError(
-          "Failed to connect to the server. Please check your connection."
+          "Failed to connect to the server. Please check your connection.",
         );
       } finally {
         setIsLoading(false);
