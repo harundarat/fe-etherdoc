@@ -116,21 +116,14 @@ export default function SearchPage() {
 
       if (response.ok) {
         const document = await response.json();
-        const documentData: SearchResult = {
-          id: document.id,
-          name: document.name,
-          cid: document.cid,
-          size: document.size,
-          issuer: document.keyvalues?.instansi || "N/A",
-          createdAt: document.created_at,
-          isValid: true,
-        };
-        setSearchResult(documentData);
+
+        // Redirect to document detail page
+        router.push(`/document/${document.id}`);
       } else {
         // Error handling
         if (response.status === 404) {
           setError(
-            "This document was not found in our system. It might not be registered",
+            "This document was not found in our system. It might not be registered"
           );
         } else if (response.status === 422) {
           setError("File is too large. The maximum allowed size is 5MB");
@@ -145,7 +138,7 @@ export default function SearchPage() {
     } catch (error) {
       console.error("File upload error: ", error);
       setError(
-        "Failed to connect to the server. Please check your connection and try again.",
+        "Failed to connect to the server. Please check your connection and try again."
       );
     } finally {
       setIsLoading(false);
@@ -178,18 +171,8 @@ export default function SearchPage() {
           const result = await response.json();
           const document = result.data;
 
-          const documentData: SearchResult = {
-            id: document.id,
-            name: document.name,
-            cid: document.cid,
-            size: document.size,
-            issuer: document.keyvalues?.instansi || "N/A",
-            createdAt: document.created_at,
-            isValid: true,
-          };
-
-          // Update UI
-          setSearchResult(documentData);
+          // Redirect to document detail page
+          router.push(`/document/${document.id}`);
         } else {
           // Handle errors based on status code
           if (response.status === 404) {
@@ -210,7 +193,7 @@ export default function SearchPage() {
       } catch (error) {
         console.error("Fetch error: ", error);
         setError(
-          "Failed to connect to the server. Please check your connection.",
+          "Failed to connect to the server. Please check your connection."
         );
       } finally {
         setIsLoading(false);
