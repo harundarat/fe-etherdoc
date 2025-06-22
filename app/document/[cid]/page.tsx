@@ -13,8 +13,8 @@ type DocumentDetail = {
   issuer: string;
   createdAt: string;
   isValid: boolean;
-  transactionHash?: string;
-  blockNumber?: number;
+  isExistEthereum: boolean;
+  isExistBase: boolean;
   network?: string;
 };
 
@@ -96,9 +96,9 @@ export default function DocumentDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const documentId = params.id as string;
+  const documentCID = params.cid as string;
 
-  // Redirect jika wallet tidak terkoneksi
+  // Redirect if wallet not connected
   useEffect(() => {
     if (!isConnected) {
       router.push("/login");
@@ -108,16 +108,14 @@ export default function DocumentDetailPage() {
   // Fetch document details
   useEffect(() => {
     const fetchDocumentDetails = async () => {
-      if (!documentId) return;
+      if (!documentCID) return;
 
       setIsLoading(true);
       setError(null);
 
       try {
         const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
-        const url = `${API_BASE_URL}/documents/${documentId}?network=private`;
-
-        console.info("Fetching document details from:", url);
+        const url = `${API_BASE_URL}/documents/${documentCID}?network=private`;
 
         const response = await fetch(url, {
           method: "GET",
@@ -127,8 +125,7 @@ export default function DocumentDetailPage() {
         });
 
         if (response.ok) {
-          const result = await response.json();
-          const doc = result.data;
+          const doc = await response.json();
 
           const documentData: DocumentDetail = {
             id: doc.id,
@@ -138,10 +135,12 @@ export default function DocumentDetailPage() {
             issuer: doc.keyvalues?.instansi || "N/A",
             createdAt: doc.created_at,
             isValid: true,
-            transactionHash: doc.transaction_hash,
-            blockNumber: doc.block_number,
+            isExistEthereum: doc.isExistEthereum,
+            isExistBase: doc.isExistBase,
             network: "Ethereum Private Network",
           };
+
+          console.info("documentData: ", documentData);
 
           setDocument(documentData);
         } else {
@@ -165,7 +164,7 @@ export default function DocumentDetailPage() {
     };
 
     fetchDocumentDetails();
-  }, [documentId]);
+  }, [documentCID]);
 
   const formatFileSize = (bytes: number) => {
     if (bytes === 0) return "0 Bytes";
@@ -398,59 +397,168 @@ export default function DocumentDetailPage() {
                   </h2>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                  <div>
-                    <label className="text-sm font-medium text-gray-500 uppercase tracking-wide">
-                      Network
-                    </label>
-                    <p className="mt-2 text-base text-gray-900">
-                      {document.network}
-                    </p>
+                <div className="space-y-6">
+                  {/* Ethereum Chain */}
+                  <div className="border border-gray-200 rounded-xl p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center">
+                          <span className="text-white font-bold text-sm">
+                            ETH
+                          </span>
+                        </div>
+                        <h3 className="text-lg font-semibold text-gray-900">
+                          Ethereum Network
+                        </h3>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {document.isExistEthereum ? (
+                          <CheckCircleIcon className="w-5 h-5 text-green-500" />
+                        ) : (
+                          <XCircleIcon className="w-5 h-5 text-gray-400" />
+                        )}
+                        <span
+                          className={`px-3 py-1 text-xs font-semibold rounded-full ${
+                            document.isExistEthereum
+                              ? "bg-green-100 text-green-800"
+                              : "bg-gray-100 text-gray-600"
+                          }`}
+                        >
+                          {document.isExistEthereum ? "VERIFIED" : "NOT FOUND"}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                          Status
+                        </label>
+                        <p
+                          className={`mt-1 text-sm font-medium ${
+                            document.isExistEthereum
+                              ? "text-green-700"
+                              : "text-gray-600"
+                          }`}
+                        >
+                          {document.isExistEthereum
+                            ? "Document verified on Ethereum blockchain"
+                            : "Document not found on Ethereum blockchain"}
+                        </p>
+                      </div>
+                      <div>
+                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                          Network Type
+                        </label>
+                        <p className="mt-1 text-sm text-gray-900">
+                          Ethereum Private Network
+                        </p>
+                      </div>
+                    </div>
+                    {document.isExistEthereum && (
+                      <div className="mt-4 pt-4 border-t border-gray-100">
+                        <a
+                          href="#"
+                          className="text-blue-600 hover:text-blue-700 font-medium inline-flex items-center gap-2 text-sm"
+                        >
+                          View on Ethereum Explorer
+                          <svg
+                            className="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                            />
+                          </svg>
+                        </a>
+                      </div>
+                    )}
                   </div>
 
-                  {document.blockNumber && (
-                    <div>
-                      <label className="text-sm font-medium text-gray-500 uppercase tracking-wide">
-                        Block Number
-                      </label>
-                      <p className="mt-2 text-base font-mono text-gray-900">
-                        #{document.blockNumber}
-                      </p>
+                  {/* Base Chain */}
+                  <div className="border border-gray-200 rounded-xl p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                          <span className="text-white font-bold text-sm">
+                            BASE
+                          </span>
+                        </div>
+                        <h3 className="text-lg font-semibold text-gray-900">
+                          Base Network
+                        </h3>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {document.isExistBase ? (
+                          <CheckCircleIcon className="w-5 h-5 text-green-500" />
+                        ) : (
+                          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-yellow-500"></div>
+                        )}
+                        <span
+                          className={`px-3 py-1 text-xs font-semibold rounded-full ${
+                            document.isExistBase
+                              ? "bg-green-100 text-green-800"
+                              : "bg-yellow-100 text-yellow-800"
+                          }`}
+                        >
+                          {document.isExistBase ? "VERIFIED" : "WAITING"}
+                        </span>
+                      </div>
                     </div>
-                  )}
-
-                  {document.transactionHash && (
-                    <div className="lg:col-span-2">
-                      <label className="text-sm font-medium text-gray-500 uppercase tracking-wide">
-                        Transaction Hash
-                      </label>
-                      <p className="mt-2 text-sm font-mono text-gray-900 bg-gray-50 p-3 rounded-lg break-all">
-                        {document.transactionHash}
-                      </p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                          Status
+                        </label>
+                        <p
+                          className={`mt-1 text-sm font-medium ${
+                            document.isExistBase
+                              ? "text-green-700"
+                              : "text-yellow-700"
+                          }`}
+                        >
+                          {document.isExistBase
+                            ? "Document verified on Base blockchain"
+                            : "Waiting message from router..."}
+                        </p>
+                      </div>
+                      <div>
+                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                          Network Type
+                        </label>
+                        <p className="mt-1 text-sm text-gray-900">
+                          Base Mainnet
+                        </p>
+                      </div>
                     </div>
-                  )}
-                </div>
-
-                <div className="mt-8 pt-6 border-t border-gray-200">
-                  <a
-                    href="#"
-                    className="text-blue-600 hover:text-blue-700 font-medium inline-flex items-center gap-2 text-lg"
-                  >
-                    View on Blockchain Explorer
-                    <svg
-                      className="w-5 h-5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                      />
-                    </svg>
-                  </a>
+                    {document.isExistBase && (
+                      <div className="mt-4 pt-4 border-t border-gray-100">
+                        <a
+                          href="#"
+                          className="text-blue-600 hover:text-blue-700 font-medium inline-flex items-center gap-2 text-sm"
+                        >
+                          View on Base Explorer
+                          <svg
+                            className="w-4 h-4"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                            />
+                          </svg>
+                        </a>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             )}
