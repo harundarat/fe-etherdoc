@@ -179,17 +179,26 @@ export default function DocumentDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f7f8fa]">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 relative overflow-hidden">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-indigo-400/20 to-pink-400/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div
+          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-br from-cyan-400/10 to-blue-400/10 rounded-full blur-3xl animate-spin"
+          style={{ animationDuration: "20s" }}
+        ></div>
+      </div>
       {/* Header */}
-      <header className="bg-white border-b border-gray-200">
+      <header className="bg-white/80 backdrop-blur-lg border-b border-white/20 shadow-lg relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
-            <Link href="/dashboard" className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+            <Link href="/dashboard" className="flex items-center gap-2 group">
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center transform group-hover:scale-110 transition-all duration-300 shadow-lg">
                 <span className="text-white font-bold text-lg">D</span>
               </div>
-              <span className="text-xl font-semibold text-gray-900">
+              <span className="text-xl font-semibold bg-gradient-to-r from-gray-900 to-blue-600 bg-clip-text text-transparent">
                 Docscout
               </span>
             </Link>
@@ -198,27 +207,31 @@ export default function DocumentDetailPage() {
             <nav className="flex items-center gap-8">
               <Link
                 href="#"
-                className="text-gray-600 hover:text-gray-900 transition-colors"
+                className="text-gray-600 hover:text-blue-600 transition-all duration-300 relative group"
               >
                 Explorers
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-600 to-purple-600 group-hover:w-full transition-all duration-300"></span>
               </Link>
               <Link
                 href="#"
-                className="text-gray-600 hover:text-gray-900 transition-colors"
+                className="text-gray-600 hover:text-blue-600 transition-all duration-300 relative group"
               >
                 Services
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-600 to-purple-600 group-hover:w-full transition-all duration-300"></span>
               </Link>
               <Link
                 href="#"
-                className="text-gray-600 hover:text-gray-900 transition-colors"
+                className="text-gray-600 hover:text-blue-600 transition-all duration-300 relative group"
               >
                 Resources
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-600 to-purple-600 group-hover:w-full transition-all duration-300"></span>
               </Link>
               <Link
                 href="#"
-                className="text-gray-600 hover:text-gray-900 transition-colors"
+                className="text-gray-600 hover:text-blue-600 transition-all duration-300 relative group"
               >
                 Docs
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-600 to-purple-600 group-hover:w-full transition-all duration-300"></span>
               </Link>
             </nav>
           </div>
@@ -226,12 +239,12 @@ export default function DocumentDetailPage() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
         {/* Back Button */}
         <div className="mb-6">
           <button
             onClick={() => router.back()}
-            className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium transition-colors"
+            className="inline-flex items-center gap-2 text-blue-600 hover:text-purple-600 font-medium transition-all duration-300 transform hover:scale-105 bg-white/70 backdrop-blur-sm px-4 py-2 rounded-full shadow-lg border border-white/50"
           >
             <ArrowLeftIcon className="w-5 h-5" />
             Back to Search
@@ -240,24 +253,38 @@ export default function DocumentDetailPage() {
 
         {/* Loading State */}
         {isLoading && (
-          <div className="text-center py-20">
-            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-6 text-gray-600 text-lg">
-              Loading document details...
-            </p>
+          <div className="fixed inset-0 backdrop-blur-md bg-black/20 flex items-center justify-center z-50">
+            <div className="bg-white/90 backdrop-blur-xl rounded-3xl p-10 shadow-2xl max-w-md mx-4 border border-white/30 animate-fade-in">
+              <div className="text-center">
+                <div className="relative">
+                  <div className="animate-spin rounded-full h-20 w-20 border-4 border-gray-200 border-t-blue-600 mx-auto"></div>
+                  <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-500/20 to-purple-500/20 blur-xl animate-pulse"></div>
+                </div>
+                <h3 className="mt-8 text-2xl font-bold bg-gradient-to-r from-gray-900 to-blue-600 bg-clip-text text-transparent">
+                  Loading Document...
+                </h3>
+                <p className="mt-3 text-gray-600 text-lg">
+                  Please wait while we fetch document details from the
+                  blockchain...
+                </p>
+              </div>
+            </div>
           </div>
         )}
 
         {/* Error State */}
         {error && (
-          <div className="p-8 bg-red-50 border-l-4 border-red-500 rounded-lg">
-            <div className="flex items-center gap-3">
-              <XCircleIcon className="w-8 h-8 text-red-500" />
-              <div>
-                <p className="font-semibold text-red-800 mb-1">
-                  Document Not Found
-                </p>
-                <p className="text-red-700">{error}</p>
+          <div className="relative group">
+            <div className="absolute inset-0 bg-gradient-to-r from-red-500/20 to-pink-500/20 rounded-3xl blur-xl group-hover:blur-2xl transition-all duration-300"></div>
+            <div className="relative p-8 bg-white/80 backdrop-blur-lg border-l-4 border-red-500 rounded-3xl shadow-xl border border-white/50">
+              <div className="flex items-center gap-3">
+                <XCircleIcon className="w-8 h-8 text-red-500" />
+                <div>
+                  <p className="font-semibold text-red-800 mb-1 text-lg">
+                    Document Not Found
+                  </p>
+                  <p className="text-red-700">{error}</p>
+                </div>
               </div>
             </div>
           </div>
@@ -265,121 +292,142 @@ export default function DocumentDetailPage() {
 
         {/* Document Details */}
         {document && (
-          <div className="space-y-8">
+          <div className="space-y-8 animate-fade-in">
             {/* Status Header */}
-            <div
-              className={`p-6 rounded-2xl border-l-4 ${
-                document.isValid
-                  ? "bg-green-50 border-green-500"
-                  : "bg-red-50 border-red-500"
-              }`}
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  {document.isValid ? (
-                    <CheckCircleIcon className="w-12 h-12 text-green-500" />
-                  ) : (
-                    <XCircleIcon className="w-12 h-12 text-red-500" />
-                  )}
-                  <div>
-                    <h1 className="text-xl font-bold text-gray-900 mb-2">
-                      Document Verification
-                    </h1>
-                    <p
-                      className={`text-base font-semibold ${
-                        document.isValid ? "text-green-800" : "text-red-800"
-                      }`}
-                    >
-                      {document.isValid
-                        ? "✓ Document is Valid and Verified"
-                        : "✗ Document is Not Valid"}
-                    </p>
+            <div className="relative group">
+              <div
+                className={`absolute inset-0 ${
+                  document.isValid
+                    ? "bg-gradient-to-r from-green-500/20 to-emerald-500/20"
+                    : "bg-gradient-to-r from-red-500/20 to-pink-500/20"
+                } rounded-3xl blur-xl group-hover:blur-2xl transition-all duration-300`}
+              ></div>
+              <div
+                className={`relative p-8 rounded-3xl border-l-4 backdrop-blur-lg shadow-xl border border-white/50 ${
+                  document.isValid
+                    ? "bg-white/80 border-green-500"
+                    : "bg-white/80 border-red-500"
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    {document.isValid ? (
+                      <div className="relative">
+                        <CheckCircleIcon className="w-12 h-12 text-green-500" />
+                        <div className="absolute inset-0 bg-green-500/20 rounded-full blur-xl animate-pulse"></div>
+                      </div>
+                    ) : (
+                      <div className="relative">
+                        <XCircleIcon className="w-12 h-12 text-red-500" />
+                        <div className="absolute inset-0 bg-red-500/20 rounded-full blur-xl animate-pulse"></div>
+                      </div>
+                    )}
+                    <div>
+                      <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-blue-600 bg-clip-text text-transparent mb-2">
+                        Document Verification
+                      </h1>
+                      <p
+                        className={`text-lg font-semibold ${
+                          document.isValid ? "text-green-800" : "text-red-800"
+                        }`}
+                      >
+                        {document.isValid
+                          ? "✓ Document is Valid and Verified"
+                          : "✗ Document is Not Valid"}
+                      </p>
+                    </div>
                   </div>
+                  <span
+                    className={`px-6 py-3 text-sm font-semibold rounded-full shadow-lg ${
+                      document.isValid
+                        ? "bg-gradient-to-r from-green-500 to-emerald-500 text-white"
+                        : "bg-gradient-to-r from-red-500 to-pink-500 text-white"
+                    }`}
+                  >
+                    {document.isValid ? "VERIFIED" : "INVALID"}
+                  </span>
                 </div>
-                <span
-                  className={`px-4 py-2 text-sm font-semibold rounded-full ${
-                    document.isValid
-                      ? "bg-green-100 text-green-800"
-                      : "bg-red-100 text-red-800"
-                  }`}
-                >
-                  {document.isValid ? "VERIFIED" : "INVALID"}
-                </span>
               </div>
             </div>
 
             {/* Document Information */}
-            <div className="bg-white rounded-2xl shadow-lg p-8">
-              <div className="flex items-center gap-3 mb-6">
-                <DocumentIcon className="w-6 h-6 text-blue-600" />
-                <h2 className="text-xl font-bold text-gray-900">
-                  Document Information
-                </h2>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="space-y-6">
-                  <div>
-                    <label className="text-sm font-medium text-gray-500 uppercase tracking-wide">
-                      Document Name
-                    </label>
-                    <p className="mt-2 text-base font-medium text-gray-900">
-                      {document.name}
-                    </p>
+            <div className="relative group">
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-3xl blur-xl group-hover:blur-2xl transition-all duration-300"></div>
+              <div className="relative bg-white/80 backdrop-blur-lg rounded-3xl shadow-xl p-8 border border-white/50">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="relative">
+                    <DocumentIcon className="w-6 h-6 text-blue-600" />
+                    <div className="absolute inset-0 bg-blue-600/20 rounded-full blur-lg animate-pulse"></div>
                   </div>
-
-                  <div>
-                    <label className="text-sm font-medium text-gray-500 uppercase tracking-wide">
-                      Document ID
-                    </label>
-                    <p className="mt-2 text-sm font-mono text-gray-900 bg-gray-50 p-3 rounded-lg break-all">
-                      {document.id}
-                    </p>
-                  </div>
-
-                  <div>
-                    <label className="text-sm font-medium text-gray-500 uppercase tracking-wide">
-                      File Size
-                    </label>
-                    <p className="mt-2 text-base text-gray-900">
-                      {formatFileSize(document.size)}
-                    </p>
-                  </div>
+                  <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
+                    Document Information
+                  </h2>
                 </div>
 
-                <div className="space-y-6">
-                  <div>
-                    <label className="text-sm font-medium text-gray-500 uppercase tracking-wide">
-                      Issuer/Institution
-                    </label>
-                    <p className="mt-2 text-base text-gray-900 bg-gray-50 p-3 rounded-lg">
-                      {document.issuer}
-                    </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="space-y-6">
+                    <div>
+                      <label className="text-sm font-medium text-gray-500 uppercase tracking-wide">
+                        Document Name
+                      </label>
+                      <p className="mt-2 text-lg font-medium bg-gradient-to-r from-gray-900 to-blue-600 bg-clip-text text-transparent">
+                        {document.name}
+                      </p>
+                    </div>
+
+                    <div>
+                      <label className="text-sm font-medium text-gray-500 uppercase tracking-wide">
+                        Document ID
+                      </label>
+                      <p className="mt-2 text-sm font-mono text-gray-900 bg-white/70 backdrop-blur-sm p-4 rounded-xl break-all border border-white/50 shadow-lg">
+                        {document.id}
+                      </p>
+                    </div>
+
+                    <div>
+                      <label className="text-sm font-medium text-gray-500 uppercase tracking-wide">
+                        File Size
+                      </label>
+                      <p className="mt-2 text-base text-gray-900 font-medium">
+                        {formatFileSize(document.size)}
+                      </p>
+                    </div>
                   </div>
 
-                  <div>
-                    <label className="text-sm font-medium text-gray-500 uppercase tracking-wide">
-                      Created At
-                    </label>
-                    <p className="mt-2 text-base text-gray-900">
-                      {new Date(document.createdAt).toLocaleString("en-US", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                        second: "2-digit",
-                      })}
-                    </p>
-                  </div>
+                  <div className="space-y-6">
+                    <div>
+                      <label className="text-sm font-medium text-gray-500 uppercase tracking-wide">
+                        Issuer/Institution
+                      </label>
+                      <p className="mt-2 text-base text-gray-900 bg-white/70 backdrop-blur-sm p-4 rounded-xl border border-white/50 shadow-lg">
+                        {document.issuer}
+                      </p>
+                    </div>
 
-                  <div>
-                    <label className="text-sm font-medium text-gray-500 uppercase tracking-wide">
-                      Content ID (CID)
-                    </label>
-                    <p className="mt-2 text-sm font-mono text-gray-900 bg-gray-50 p-3 rounded-lg break-all">
-                      {document.cid}
-                    </p>
+                    <div>
+                      <label className="text-sm font-medium text-gray-500 uppercase tracking-wide">
+                        Created At
+                      </label>
+                      <p className="mt-2 text-base text-gray-900 font-medium">
+                        {new Date(document.createdAt).toLocaleString("en-US", {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          second: "2-digit",
+                        })}
+                      </p>
+                    </div>
+
+                    <div>
+                      <label className="text-sm font-medium text-gray-500 uppercase tracking-wide">
+                        Content ID (CID)
+                      </label>
+                      <p className="mt-2 text-sm font-mono text-gray-900 bg-white/70 backdrop-blur-sm p-4 rounded-xl break-all border border-white/50 shadow-lg">
+                        {document.cid}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -387,177 +435,191 @@ export default function DocumentDetailPage() {
 
             {/* Blockchain Information */}
             {document.isValid && (
-              <div className="bg-white rounded-2xl shadow-lg p-8">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-6 h-6 bg-blue-600 rounded-lg flex items-center justify-center">
-                    <span className="text-white font-bold">⛓</span>
-                  </div>
-                  <h2 className="text-xl font-bold text-gray-900">
-                    Blockchain Information
-                  </h2>
-                </div>
-
-                <div className="space-y-6">
-                  {/* Ethereum Chain */}
-                  <div className="border border-gray-200 rounded-xl p-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center">
-                          <span className="text-white font-bold text-sm">
-                            ETH
-                          </span>
-                        </div>
-                        <h3 className="text-lg font-semibold text-gray-900">
-                          Ethereum Network
-                        </h3>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        {document.isExistEthereum ? (
-                          <CheckCircleIcon className="w-5 h-5 text-green-500" />
-                        ) : (
-                          <XCircleIcon className="w-5 h-5 text-gray-400" />
-                        )}
-                        <span
-                          className={`px-3 py-1 text-xs font-semibold rounded-full ${
-                            document.isExistEthereum
-                              ? "bg-green-100 text-green-800"
-                              : "bg-gray-100 text-gray-600"
-                          }`}
-                        >
-                          {document.isExistEthereum ? "VERIFIED" : "NOT FOUND"}
-                        </span>
-                      </div>
+              <div className="relative group">
+                <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/20 to-cyan-500/20 rounded-3xl blur-xl group-hover:blur-2xl transition-all duration-300"></div>
+                <div className="relative bg-white/80 backdrop-blur-lg rounded-3xl shadow-xl p-8 border border-white/50">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="relative w-6 h-6 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center shadow-lg">
+                      <span className="text-white font-bold">⛓</span>
+                      <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-lg blur-lg animate-pulse"></div>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-                          Status
-                        </label>
-                        <p
-                          className={`mt-1 text-sm font-medium ${
-                            document.isExistEthereum
-                              ? "text-green-700"
-                              : "text-gray-600"
-                          }`}
-                        >
-                          {document.isExistEthereum
-                            ? "Document verified on Ethereum blockchain"
-                            : "Document not found on Ethereum blockchain"}
-                        </p>
-                      </div>
-                      <div>
-                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-                          Network Type
-                        </label>
-                        <p className="mt-1 text-sm text-gray-900">
-                          Ethereum Private Network
-                        </p>
-                      </div>
-                    </div>
-                    {document.isExistEthereum && (
-                      <div className="mt-4 pt-4 border-t border-gray-100">
-                        <a
-                          href="#"
-                          className="text-blue-600 hover:text-blue-700 font-medium inline-flex items-center gap-2 text-sm"
-                        >
-                          View on Ethereum Explorer
-                          <svg
-                            className="w-4 h-4"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                            />
-                          </svg>
-                        </a>
-                      </div>
-                    )}
+                    <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
+                      Blockchain Information
+                    </h2>
                   </div>
 
-                  {/* Base Chain */}
-                  <div className="border border-gray-200 rounded-xl p-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
-                          <span className="text-white font-bold text-sm">
-                            BASE
-                          </span>
+                  <div className="space-y-6">
+                    {/* Ethereum Chain */}
+                    <div className="relative group">
+                      <div className="absolute inset-0 bg-gradient-to-r from-gray-700/10 to-blue-600/10 rounded-2xl blur-lg group-hover:blur-xl transition-all duration-300"></div>
+                      <div className="relative border border-white/50 bg-white/60 backdrop-blur-sm rounded-2xl p-6 shadow-lg">
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center gap-3">
+                            <div className="relative w-8 h-8 bg-gradient-to-br from-gray-700 to-gray-900 rounded-full flex items-center justify-center shadow-lg">
+                              <span className="text-white font-bold text-sm">
+                                ETH
+                              </span>
+                              <div className="absolute inset-0 bg-gray-700/20 rounded-full blur-lg animate-pulse"></div>
+                            </div>
+                            <h3 className="text-lg font-semibold bg-gradient-to-r from-gray-900 to-blue-600 bg-clip-text text-transparent">
+                              Ethereum Network
+                            </h3>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {document.isExistEthereum ? (
+                              <CheckCircleIcon className="w-5 h-5 text-green-500" />
+                            ) : (
+                              <XCircleIcon className="w-5 h-5 text-gray-400" />
+                            )}
+                            <span
+                              className={`px-3 py-1 text-xs font-semibold rounded-full shadow-lg ${
+                                document.isExistEthereum
+                                  ? "bg-gradient-to-r from-green-500 to-emerald-500 text-white"
+                                  : "bg-gradient-to-r from-gray-400 to-gray-500 text-white"
+                              }`}
+                            >
+                              {document.isExistEthereum
+                                ? "VERIFIED"
+                                : "NOT FOUND"}
+                            </span>
+                          </div>
                         </div>
-                        <h3 className="text-lg font-semibold text-gray-900">
-                          Base Network
-                        </h3>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        {document.isExistBase ? (
-                          <CheckCircleIcon className="w-5 h-5 text-green-500" />
-                        ) : (
-                          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-yellow-500"></div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                              Status
+                            </label>
+                            <p
+                              className={`mt-1 text-sm font-medium ${
+                                document.isExistEthereum
+                                  ? "text-green-700"
+                                  : "text-gray-600"
+                              }`}
+                            >
+                              {document.isExistEthereum
+                                ? "Document verified on Ethereum blockchain"
+                                : "Document not found on Ethereum blockchain"}
+                            </p>
+                          </div>
+                          <div>
+                            <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                              Network Type
+                            </label>
+                            <p className="mt-1 text-sm text-gray-900 font-medium">
+                              Ethereum Private Network
+                            </p>
+                          </div>
+                        </div>
+                        {document.isExistEthereum && (
+                          <div className="mt-4 pt-4 border-t border-white/30">
+                            <a
+                              href="#"
+                              className="text-blue-600 hover:text-purple-600 font-medium inline-flex items-center gap-2 text-sm transition-all duration-300 transform hover:scale-105"
+                            >
+                              View on Ethereum Explorer
+                              <svg
+                                className="w-4 h-4"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                                />
+                              </svg>
+                            </a>
+                          </div>
                         )}
-                        <span
-                          className={`px-3 py-1 text-xs font-semibold rounded-full ${
-                            document.isExistBase
-                              ? "bg-green-100 text-green-800"
-                              : "bg-yellow-100 text-yellow-800"
-                          }`}
-                        >
-                          {document.isExistBase ? "VERIFIED" : "WAITING"}
-                        </span>
                       </div>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-                          Status
-                        </label>
-                        <p
-                          className={`mt-1 text-sm font-medium ${
-                            document.isExistBase
-                              ? "text-green-700"
-                              : "text-yellow-700"
-                          }`}
-                        >
-                          {document.isExistBase
-                            ? "Document verified on Base blockchain"
-                            : "Waiting message from router..."}
-                        </p>
-                      </div>
-                      <div>
-                        <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-                          Network Type
-                        </label>
-                        <p className="mt-1 text-sm text-gray-900">
-                          Base Mainnet
-                        </p>
+
+                    {/* Base Chain */}
+                    <div className="relative group">
+                      <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-cyan-500/10 rounded-2xl blur-lg group-hover:blur-xl transition-all duration-300"></div>
+                      <div className="relative border border-white/50 bg-white/60 backdrop-blur-sm rounded-2xl p-6 shadow-lg">
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center gap-3">
+                            <div className="relative w-8 h-8 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full flex items-center justify-center shadow-lg">
+                              <span className="text-white font-bold text-sm">
+                                BASE
+                              </span>
+                              <div className="absolute inset-0 bg-blue-500/20 rounded-full blur-lg animate-pulse"></div>
+                            </div>
+                            <h3 className="text-lg font-semibold bg-gradient-to-r from-gray-900 to-blue-600 bg-clip-text text-transparent">
+                              Base Network
+                            </h3>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {document.isExistBase ? (
+                              <CheckCircleIcon className="w-5 h-5 text-green-500" />
+                            ) : (
+                              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-yellow-500"></div>
+                            )}
+                            <span
+                              className={`px-3 py-1 text-xs font-semibold rounded-full shadow-lg ${
+                                document.isExistBase
+                                  ? "bg-gradient-to-r from-green-500 to-emerald-500 text-white"
+                                  : "bg-gradient-to-r from-yellow-500 to-orange-500 text-white"
+                              }`}
+                            >
+                              {document.isExistBase ? "VERIFIED" : "WAITING"}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                              Status
+                            </label>
+                            <p
+                              className={`mt-1 text-sm font-medium ${
+                                document.isExistBase
+                                  ? "text-green-700"
+                                  : "text-yellow-700"
+                              }`}
+                            >
+                              {document.isExistBase
+                                ? "Document verified on Base blockchain"
+                                : "Waiting message from router..."}
+                            </p>
+                          </div>
+                          <div>
+                            <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                              Network Type
+                            </label>
+                            <p className="mt-1 text-sm text-gray-900 font-medium">
+                              Base Mainnet
+                            </p>
+                          </div>
+                        </div>
+                        {document.isExistBase && (
+                          <div className="mt-4 pt-4 border-t border-white/30">
+                            <a
+                              href="#"
+                              className="text-blue-600 hover:text-purple-600 font-medium inline-flex items-center gap-2 text-sm transition-all duration-300 transform hover:scale-105"
+                            >
+                              View on Base Explorer
+                              <svg
+                                className="w-4 h-4"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                                />
+                              </svg>
+                            </a>
+                          </div>
+                        )}
                       </div>
                     </div>
-                    {document.isExistBase && (
-                      <div className="mt-4 pt-4 border-t border-gray-100">
-                        <a
-                          href="#"
-                          className="text-blue-600 hover:text-blue-700 font-medium inline-flex items-center gap-2 text-sm"
-                        >
-                          View on Base Explorer
-                          <svg
-                            className="w-4 h-4"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                            />
-                          </svg>
-                        </a>
-                      </div>
-                    )}
                   </div>
                 </div>
               </div>
@@ -565,6 +627,36 @@ export default function DocumentDetailPage() {
           </div>
         )}
       </main>
+
+      {/* Custom CSS for animations */}
+      <style jsx>{`
+        @keyframes fade-in {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        .animate-fade-in {
+          animation: fade-in 0.6s ease-out forwards;
+        }
+
+        .delay-300 {
+          animation-delay: 300ms;
+        }
+
+        .delay-500 {
+          animation-delay: 500ms;
+        }
+
+        .delay-1000 {
+          animation-delay: 1000ms;
+        }
+      `}</style>
     </div>
   );
 }

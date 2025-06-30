@@ -89,11 +89,14 @@ export default function Sidebar({
   };
 
   return (
-    <div className="w-64 bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 border-r border-gray-700/50 flex flex-col shadow-2xl">
+    <div className="w-64 h-screen bg-white/80 backdrop-blur-xl border-r border-white/30 flex flex-col shadow-2xl">
+      {/* Gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent pointer-events-none"></div>
+
       {/* Logo */}
-      <div className="p-6 border-b border-gray-700/50">
+      <div className="p-6 border-b border-white/30 relative z-10">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+          <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg transform hover:scale-110 transition-all duration-300">
             <svg
               className="w-6 h-6 text-white"
               fill="none"
@@ -109,10 +112,10 @@ export default function Sidebar({
             </svg>
           </div>
           <div>
-            <span className="text-xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-              DocuChain
+            <span className="text-xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
+              EtherDoc
             </span>
-            <div className="text-xs text-gray-400 font-medium">
+            <div className="text-xs text-gray-600 font-medium">
               Secure • Verified
             </div>
           </div>
@@ -120,9 +123,9 @@ export default function Sidebar({
       </div>
 
       {/* Navigation Menu */}
-      <nav className="flex-1 p-4">
+      <nav className="flex-1 p-4 relative z-10">
         <div className="mb-6">
-          <div className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 px-3">
+          <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 px-3">
             Main Menu
           </div>
           <ul className="space-y-2">
@@ -130,20 +133,20 @@ export default function Sidebar({
               <li key={item.id}>
                 <button
                   onClick={() => setActiveSection(item.id)}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all duration-200 group ${
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all duration-300 group ${
                     activeSection === item.id
-                      ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-lg transform scale-105"
-                      : "text-gray-300 hover:text-white hover:bg-gray-700/50"
+                      ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-xl shadow-blue-500/25 transform scale-105"
+                      : "text-gray-700 hover:text-gray-900 hover:bg-white/60 backdrop-blur-sm border border-white/20 hover:border-white/40 hover:shadow-lg"
                   }`}
                 >
                   <item.icon
-                    className={`w-5 h-5 transition-transform group-hover:scale-110 ${
-                      activeSection === item.id ? "text-white" : "text-gray-400"
+                    className={`w-5 h-5 transition-all duration-300 group-hover:scale-110 ${
+                      activeSection === item.id ? "text-white" : "text-gray-500"
                     }`}
                   />
                   <span className="font-medium">{item.label}</span>
                   {activeSection === item.id && (
-                    <div className="ml-auto w-2 h-2 bg-white rounded-full"></div>
+                    <div className="ml-auto w-2 h-2 bg-white rounded-full shadow-lg"></div>
                   )}
                 </button>
               </li>
@@ -153,31 +156,34 @@ export default function Sidebar({
       </nav>
 
       {/* Help */}
-      <div className="p-4 border-t border-gray-700/50">
-        <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-300 hover:text-white hover:bg-gray-700/50 transition-all duration-200 group">
-          <HelpIcon className="w-5 h-5 group-hover:scale-110 transition-transform" />
+      <div className="p-4 border-t border-white/30 relative z-10">
+        <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-700 hover:text-gray-900 hover:bg-white/60 backdrop-blur-sm border border-white/20 hover:border-white/40 hover:shadow-lg transition-all duration-300 group">
+          <HelpIcon className="w-5 h-5 group-hover:scale-110 transition-transform text-gray-500" />
           <span className="font-medium">Help & Support</span>
         </button>
       </div>
 
       {/* User Profile */}
-      <div className="p-4 border-t border-gray-700/50">
-        <div className="bg-gray-800/50 rounded-xl p-4 backdrop-blur-sm">
+      <div className="p-4 border-t border-white/30 relative z-10">
+        <div className="bg-white/50 backdrop-blur-sm rounded-xl p-4 border border-white/30 shadow-lg">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-r from-green-400 to-blue-500 rounded-full flex items-center justify-center shadow-lg">
+              <div className="w-10 h-10 bg-gradient-to-br from-green-400 to-blue-500 rounded-full flex items-center justify-center shadow-lg">
                 <UserIcon className="w-5 h-5 text-white" />
               </div>
               <div>
-                <div className="text-sm font-medium text-white">
+                <div className="text-sm font-medium text-gray-900">
                   {userAddress ? formatAddress(userAddress) : "User"}
                 </div>
-                <div className="text-xs text-gray-400">Connected</div>
+                <div className="text-xs text-gray-600 flex items-center gap-1">
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                  Connected
+                </div>
               </div>
             </div>
             <button
               onClick={() => open()}
-              className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded-lg transition-all duration-200 hover:scale-110"
+              className="p-2 text-gray-500 hover:text-gray-700 hover:bg-white/60 rounded-lg transition-all duration-300 hover:scale-110 border border-white/20 hover:border-white/40"
               title="Manage Wallet"
             >
               <LogoutIcon className="w-4 h-4" />

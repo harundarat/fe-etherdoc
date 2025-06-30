@@ -183,12 +183,12 @@ export default function DocumentsContent({
   );
 
   return (
-    <div className="flex-1 overflow-auto bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
+    <div className="flex-1 overflow-auto bg-transparent min-h-screen">
       {/* Header */}
-      <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200/50 px-8 py-8">
+      <div className="bg-white/70 backdrop-blur-xl border-b border-white/30 px-8 py-8 shadow-lg">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
               Document Dashboard
             </h1>
             <p className="text-gray-600 mt-1">
@@ -200,7 +200,7 @@ export default function DocumentsContent({
               console.info("upload button clicked");
               onUploadClick();
             }}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-200 cursor-pointer shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-300 cursor-pointer shadow-xl shadow-blue-500/25 hover:shadow-2xl hover:shadow-blue-500/40 transform hover:-translate-y-0.5"
           >
             <UploadIcon className="w-5 h-5" />
             Upload Document
@@ -212,7 +212,7 @@ export default function DocumentsContent({
       <div className="px-8 py-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           {/* Total Documents */}
-          <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 animate-fadeInUp card-hover">
+          <div className="bg-white/70 backdrop-blur-xl rounded-2xl p-6 shadow-xl border border-white/30 hover:shadow-2xl transition-all duration-300 animate-fadeInUp card-hover">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">
@@ -222,7 +222,7 @@ export default function DocumentsContent({
                   {totalDocuments}
                 </p>
               </div>
-              <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
+              <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
                 <svg
                   className="w-6 h-6 text-white"
                   fill="none"
@@ -242,7 +242,7 @@ export default function DocumentsContent({
 
           {/* Storage Used */}
           <div
-            className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 animate-fadeInUp card-hover"
+            className="bg-white/70 backdrop-blur-xl rounded-2xl p-6 shadow-xl border border-white/30 hover:shadow-2xl transition-all duration-300 animate-fadeInUp card-hover"
             style={{ animationDelay: "0.1s" }}
           >
             <div className="flex items-center justify-between">
@@ -254,7 +254,7 @@ export default function DocumentsContent({
                   {(totalSize / (1024 * 1024)).toFixed(1)} MB
                 </p>
               </div>
-              <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-green-600 rounded-xl flex items-center justify-center">
+              <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
                 <svg
                   className="w-6 h-6 text-white"
                   fill="none"
@@ -274,7 +274,7 @@ export default function DocumentsContent({
 
           {/* Recent Uploads */}
           <div
-            className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300 animate-fadeInUp card-hover"
+            className="bg-white/70 backdrop-blur-xl rounded-2xl p-6 shadow-xl border border-white/30 hover:shadow-2xl transition-all duration-300 animate-fadeInUp card-hover"
             style={{ animationDelay: "0.2s" }}
           >
             <div className="flex items-center justify-between">
@@ -284,7 +284,7 @@ export default function DocumentsContent({
                   {recentDocuments}
                 </p>
               </div>
-              <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl flex items-center justify-center">
+              <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-600 rounded-xl flex items-center justify-center shadow-lg">
                 <svg
                   className="w-6 h-6 text-white"
                   fill="none"
@@ -306,7 +306,7 @@ export default function DocumentsContent({
 
       {/* Tabs */}
       <div className="px-8 mb-6">
-        <div className="bg-white rounded-2xl p-2 shadow-lg border border-gray-100 animate-fadeIn">
+        <div className="bg-white/70 backdrop-blur-xl rounded-2xl p-2 shadow-xl border border-white/30 animate-fadeIn">
           <nav className="flex space-x-2">
             {[
               { id: "all", label: "All Documents", icon: "📁" },
@@ -326,10 +326,10 @@ export default function DocumentsContent({
                     fetchDocuments("public");
                   }
                 }}
-                className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium text-sm transition-all duration-200 ${
+                className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium text-sm transition-all duration-300 ${
                   activeTab === tab.id
-                    ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-md"
-                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                    ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-xl shadow-blue-500/25"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-white/60 hover:shadow-lg"
                 }`}
               >
                 <span>{tab.icon}</span>
@@ -349,7 +349,7 @@ export default function DocumentsContent({
             placeholder="Search documents by name, type, or date..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-12 pr-4 py-4 bg-white border border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-lg transition-all duration-200 placeholder-gray-400"
+            className="w-full pl-12 pr-4 py-4 bg-white/70 backdrop-blur-xl border border-white/30 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-xl transition-all duration-300 placeholder-gray-400"
           />
         </div>
       </div>
@@ -357,7 +357,7 @@ export default function DocumentsContent({
       {/* Loading State */}
       {isLoading && (
         <div className="px-8">
-          <div className="bg-white rounded-2xl p-12 text-center shadow-lg border border-gray-100 animate-scaleIn">
+          <div className="bg-white/70 backdrop-blur-xl rounded-2xl p-12 text-center shadow-xl border border-white/30 animate-scaleIn">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4 animate-pulse-glow"></div>
             <div className="text-gray-600 font-medium">
               Loading documents...
@@ -372,7 +372,7 @@ export default function DocumentsContent({
       {/* Error State */}
       {error && (
         <div className="px-8">
-          <div className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 animate-fadeIn">
+          <div className="bg-white/70 backdrop-blur-xl rounded-2xl p-8 shadow-xl border border-white/30 animate-fadeIn">
             <div className="bg-gradient-to-r from-red-50 to-red-100 border border-red-200 rounded-xl p-6">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center">
@@ -405,7 +405,7 @@ export default function DocumentsContent({
       {/* Table - hanya tampil jika tidak loading dan tidak ada error */}
       {!isLoading && !error && (
         <div className="px-8">
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden animate-fadeInUp">
+          <div className="bg-white/70 backdrop-blur-xl rounded-2xl shadow-xl border border-white/30 overflow-hidden animate-fadeInUp">
             {filteredDocuments.length === 0 ? (
               <div className="p-16 text-center">
                 <div className="w-24 h-24 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center mx-auto mb-6 animate-float">
@@ -431,7 +431,7 @@ export default function DocumentsContent({
                 </p>
                 <button
                   onClick={onUploadClick}
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all duration-200 shadow-lg btn-gradient transform hover:scale-105"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 transition-all duration-300 shadow-xl shadow-blue-500/25 btn-gradient transform hover:scale-105"
                 >
                   <UploadIcon className="w-5 h-5" />
                   Upload First Document
@@ -440,7 +440,7 @@ export default function DocumentsContent({
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full">
-                  <thead className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
+                  <thead className="bg-white/50 backdrop-blur-sm border-b border-white/30">
                     <tr>
                       <th className="px-8 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                         Document Name
@@ -463,12 +463,12 @@ export default function DocumentsContent({
                     {filteredDocuments.map((doc, index) => (
                       <tr
                         key={doc.id}
-                        className="hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 transition-all duration-200 group animate-fadeIn"
+                        className="hover:bg-white/60 hover:backdrop-blur-xl transition-all duration-300 group animate-fadeIn border-b border-white/20"
                         style={{ animationDelay: `${index * 0.05}s` }}
                       >
                         <td className="px-8 py-6 whitespace-nowrap">
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl flex items-center justify-center">
+                            <div className="w-10 h-10 bg-gradient-to-br from-blue-100 to-purple-200 rounded-xl flex items-center justify-center shadow-lg">
                               <svg
                                 className="w-5 h-5 text-blue-600"
                                 fill="none"
@@ -484,7 +484,7 @@ export default function DocumentsContent({
                               </svg>
                             </div>
                             <div>
-                              <div className="text-sm font-semibold text-gray-900 group-hover:text-blue-900 transition-colors">
+                              <div className="text-sm font-semibold text-gray-900 group-hover:text-purple-900 transition-colors">
                                 {doc.name}
                               </div>
                               <div className="text-xs text-gray-500 font-mono">
@@ -494,12 +494,12 @@ export default function DocumentsContent({
                           </div>
                         </td>
                         <td className="px-6 py-6 whitespace-nowrap">
-                          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
+                          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-white/60 backdrop-blur-sm text-gray-700 border border-white/30">
                             {(doc.size / 1024).toFixed(1)} KB
                           </span>
                         </td>
                         <td className="px-6 py-6 whitespace-nowrap">
-                          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+                          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-blue-100 to-purple-100 text-purple-700 border border-white/30">
                             {doc.mime_type.split("/")[1]?.toUpperCase() ||
                               "FILE"}
                           </span>
@@ -516,7 +516,7 @@ export default function DocumentsContent({
                         </td>
                         <td className="px-6 py-6 whitespace-nowrap">
                           <div className="flex items-center gap-2">
-                            <button className="inline-flex items-center gap-1 px-3 py-2 text-blue-600 hover:text-white hover:bg-blue-600 text-sm font-medium rounded-lg transition-all duration-200 border border-blue-200 hover:border-blue-600">
+                            <button className="inline-flex items-center gap-1 px-3 py-2 text-blue-600 hover:text-white hover:bg-gradient-to-r hover:from-blue-600 hover:to-purple-600 text-sm font-medium rounded-lg transition-all duration-300 border border-blue-200 hover:border-transparent hover:shadow-lg">
                               <ViewIcon className="w-4 h-4" />
                               View
                             </button>

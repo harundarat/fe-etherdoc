@@ -34,21 +34,16 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="flex h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 relative overflow-hidden">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-5">
+    <div className="flex h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 relative overflow-hidden">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-400/10 to-purple-400/10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-br from-indigo-400/10 to-pink-400/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
         <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage: `radial-gradient(circle at 25% 25%, #3b82f6 0%, transparent 50%),
-                           radial-gradient(circle at 75% 75%, #8b5cf6 0%, transparent 50%)`,
-          }}
-        />
+          className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-br from-cyan-400/5 to-blue-400/5 rounded-full blur-3xl animate-spin"
+          style={{ animationDuration: "30s" }}
+        ></div>
       </div>
-
-      {/* Animated Background Elements */}
-      <div className="absolute top-20 left-20 w-32 h-32 bg-blue-500/10 rounded-full blur-xl animate-pulse"></div>
-      <div className="absolute bottom-20 right-20 w-48 h-48 bg-purple-500/10 rounded-full blur-xl animate-pulse delay-1000"></div>
 
       <Toaster
         position="top-center"
@@ -56,20 +51,24 @@ export default function DashboardPage() {
         toastOptions={{
           duration: 4000,
           style: {
-            background: "rgba(255, 255, 255, 0.95)",
-            backdropFilter: "blur(10px)",
-            border: "1px solid rgba(255, 255, 255, 0.2)",
-            borderRadius: "12px",
+            background: "rgba(255, 255, 255, 0.9)",
+            backdropFilter: "blur(20px)",
+            border: "1px solid rgba(255, 255, 255, 0.3)",
+            borderRadius: "16px",
             color: "#1f2937",
+            boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
           },
         }}
       />
 
-      <Sidebar
-        activeSection={activeSection}
-        setActiveSection={setActiveSection}
-        userAddress={address}
-      />
+      {/* Updated Sidebar */}
+      <div className="relative z-10">
+        <Sidebar
+          activeSection={activeSection}
+          setActiveSection={setActiveSection}
+          userAddress={address}
+        />
+      </div>
 
       <main className="flex-1 relative z-10 overflow-y-auto">
         {activeSection === "documents" && (
