@@ -285,7 +285,7 @@ export default function SearchPage() {
             Trusted Verification Across Blockchains
           </p>
           <div className="mt-8 text-lg text-gray-600 max-w-2xl mx-auto animate-fade-in delay-500">
-            Seamlessly verify your documents with Blockscout's reliable
+            Seamlessly verify your documents with Blockscout&apos;s reliable
             cross-chain technology.
           </div>
         </div>
