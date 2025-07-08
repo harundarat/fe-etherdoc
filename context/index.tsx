@@ -25,7 +25,7 @@ if (!projectId) {
 const metadata = {
   name: "Etherdoc",
   description: "Document Verification Using Blockchain and IPFS",
-  url: "https://be-etherdoc-production.up.railway.app",
+  url: "https://etherdoc.up.railway.app",
   icons: ["https://assets.reown.com/reown-profile-pic.png"],
 };
 
