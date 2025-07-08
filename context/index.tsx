@@ -24,8 +24,8 @@ if (!projectId) {
 // Set up metadata
 const metadata = {
   name: "Etherdoc",
-  description: "AppKit example",
-  url: "http://localhost:3000",
+  description: "Document Verification Using Blockchain and IPFS",
+  url: "https://be-etherdoc-production.up.railway.app",
   icons: ["https://assets.reown.com/reown-profile-pic.png"],
 };
 
