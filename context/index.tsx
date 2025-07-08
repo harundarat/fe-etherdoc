@@ -38,6 +38,8 @@ const modal = createAppKit({
   metadata,
   features: {
     analytics: true,
+    socials: false,
+    email: false,
   },
 });
 
