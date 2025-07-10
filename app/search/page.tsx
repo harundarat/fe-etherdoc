@@ -1,9 +1,7 @@
 "use client";
 
 import { useState, type ChangeEvent, type FormEvent } from "react";
-import { useAccount } from "wagmi";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
 import Link from "next/link";
 
 type SearchResult = {
@@ -54,7 +52,6 @@ const UploadIcon = (props: React.SVGProps<SVGSVGElement>) => (
 );
 
 export default function SearchPage() {
-  const { isConnected } = useAccount();
   const router = useRouter();
 
   // State for UI
@@ -68,17 +65,6 @@ export default function SearchPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searchResult, setSearchResult] = useState<SearchResult | null>(null);
-
-  // Search suggestions/tags
-  const searchTags = [
-    "Document ID",
-    "Transaction",
-    "Issuer Address",
-    "Hash",
-    "Certificate",
-    "Verification",
-    "Timestamp",
-  ];
 
   const resetState = () => {
     setIsLoading(true);
