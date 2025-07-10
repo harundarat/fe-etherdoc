@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 interface ApiFile {
   id: string;
@@ -87,6 +88,8 @@ export default function DocumentsContent({
 }: DocumentsContentProps) {
   console.info("DocumentsContent Rendered");
   console.info("onUploadClick: ", onUploadClick);
+
+  const router = useRouter();
 
   const [activeTab, setActiveTab] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
@@ -516,7 +519,12 @@ export default function DocumentsContent({
                         </td>
                         <td className="px-6 py-6 whitespace-nowrap">
                           <div className="flex items-center gap-2">
-                            <button className="inline-flex items-center gap-1 px-3 py-2 text-blue-600 hover:text-white hover:bg-gradient-to-r hover:from-blue-600 hover:to-purple-600 text-sm font-medium rounded-lg transition-all duration-300 border border-blue-200 hover:border-transparent hover:shadow-lg">
+                            <button
+                              className="inline-flex items-center gap-1 px-3 py-2 text-blue-600 hover:text-white hover:bg-gradient-to-r hover:from-blue-600 hover:to-purple-600 text-sm font-medium rounded-lg transition-all duration-300 border border-blue-200 hover:border-transparent hover:shadow-lg"
+                              onClick={() =>
+                                router.push(`/document/${doc.cid}`)
+                              }
+                            >
                               <ViewIcon className="w-4 h-4" />
                               View
                             </button>

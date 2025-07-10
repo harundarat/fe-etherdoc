@@ -90,20 +90,12 @@ const DocumentIcon = (props: React.SVGProps<SVGSVGElement>) => (
 export default function DocumentDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const { isConnected } = useAccount();
 
   const [document, setDocument] = useState<DocumentDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const documentCID = params.cid as string;
-
-  // Redirect if wallet not connected
-  useEffect(() => {
-    if (!isConnected) {
-      router.push("/login");
-    }
-  }, [isConnected, router]);
 
   // Fetch document details
   useEffect(() => {
@@ -173,10 +165,6 @@ export default function DocumentDetailPage() {
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   };
-
-  if (!isConnected) {
-    return null;
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 relative overflow-hidden">

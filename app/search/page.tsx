@@ -80,13 +80,6 @@ export default function SearchPage() {
     "Timestamp",
   ];
 
-  // Redirect if wallet not connected
-  useEffect(() => {
-    if (!isConnected) {
-      router.push("/login");
-    }
-  }, [isConnected, router]);
-
   const resetState = () => {
     setIsLoading(true);
     setError(null);
@@ -210,10 +203,6 @@ export default function SearchPage() {
       setSearchResult(null);
     }
   };
-
-  if (!isConnected) {
-    return null;
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 relative overflow-hidden">
@@ -355,8 +344,8 @@ export default function SearchPage() {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search by document ID / transaction / hash ..."
-                  className="w-full pl-16 pr-32 py-6 text-lg bg-transparent rounded-full focus:outline-none transition-all"
+                  placeholder="Search by document CID ..."
+                  className="w-full pl-16 pr-32 py-6 text-lg bg-transparent rounded-full focus:outline-none transition-all text-gray-700"
                   autoFocus
                 />
                 <button
@@ -386,16 +375,14 @@ export default function SearchPage() {
                         ? selectedFile.name
                         : "Click to upload or drag and drop"}
                     </p>
-                    <p className="text-sm text-gray-500">
-                      PDF, DOCX, PNG, or JPG (Max 10MB)
-                    </p>
+                    <p className="text-sm text-gray-500">PDF (Max 10MB)</p>
                   </div>
                   <input
                     id="file-upload"
                     type="file"
                     className="hidden"
                     onChange={handleFileChange}
-                    accept=".pdf,.docx,.png,.jpg,.jpeg"
+                    accept=".pdf"
                   />
                 </label>
               </div>
@@ -426,25 +413,6 @@ export default function SearchPage() {
             </div>
           )}
         </form>
-
-        {/* Search Tags */}
-        {activeTab === "search" && !searchResult && !isLoading && (
-          <div className="text-center max-w-4xl mx-auto">
-            <p className="text-gray-600 mb-6 text-lg">Try searching by:</p>
-            <div className="flex flex-wrap justify-center gap-3">
-              {searchTags.map((tag, index) => (
-                <button
-                  key={tag}
-                  onClick={() => setSearchQuery(tag)}
-                  className="px-6 py-3 bg-white/70 backdrop-blur-sm hover:bg-white/90 text-gray-700 hover:text-blue-600 rounded-full text-sm font-medium transition-all duration-300 transform hover:scale-105 shadow-lg border border-white/50 animate-fade-in"
-                  style={{ animationDelay: `${index * 100}ms` }}
-                >
-                  {tag}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
 
         {/* Loading Popup Modal */}
         {isLoading && (
