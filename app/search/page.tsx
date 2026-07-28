@@ -244,7 +244,7 @@ export default function SearchPage() {
                   d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                 />
               </svg>
-              Search by CID
+              Search by Document ID
             </span>
           </button>
           <button
@@ -285,7 +285,7 @@ export default function SearchPage() {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search by document CID ..."
+                  placeholder="Search by document ID (0x...)..."
                   className="w-full pl-16 pr-32 py-6 text-lg bg-transparent rounded-full focus:outline-none transition-all text-gray-700"
                   autoFocus
                 />
@@ -316,7 +316,7 @@ export default function SearchPage() {
                         ? selectedFile.name
                         : "Click to upload or drag and drop"}
                     </p>
-                    <p className="text-sm text-gray-500">PDF (Max 10MB)</p>
+                    <p className="text-sm text-gray-500">PDF (Max 5MB)</p>
                   </div>
                   <input
                     id="file-upload"

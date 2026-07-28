@@ -281,7 +281,7 @@ export default function DocumentsContent({
                   } else if (tab.id === "private") {
                     fetchDocuments("private");
                   } else {
-                    fetchDocuments("public");
+                    fetchDocuments("private");
                   }
                 }}
                 className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium text-sm transition-all duration-300 ${
@@ -477,8 +477,9 @@ export default function DocumentsContent({
                             <button
                               className="inline-flex items-center gap-1 px-3 py-2 text-blue-600 hover:text-white hover:bg-gradient-to-r hover:from-blue-600 hover:to-purple-600 text-sm font-medium rounded-lg transition-all duration-300 border border-blue-200 hover:border-transparent hover:shadow-lg"
                               onClick={() =>
-                                router.push(`/document/${doc.cid}`)
+                                router.push(`/document/${doc.id}`)
                               }
+                              title={`CID: ${doc.cid}`}
                             >
                               <ViewIcon className="w-4 h-4" />
                               View
