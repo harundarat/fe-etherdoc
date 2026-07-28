@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAccount, useSignMessage } from "wagmi";
 import { useAppKit } from "@reown/appkit/react";
+import { authApi } from "@/lib/api";
 
 export default function LoginPage() {
   const { open } = useAppKit();
@@ -25,40 +26,19 @@ export default function LoginPage() {
     setError(null);
 
     try {
-      // 1. Get nonce from server
-      const nonceRes = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/auth/nonce`,
-      );
-      if (!nonceRes.ok) {
-        throw new Error("Failed to fetch message from server.");
-      }
-      const { messageString } = await nonceRes.json();
-      if (!messageString) {
+      // 1. Get SIWE challenge nonce from server (POST /auth/nonce with address)
+      const nonceChallenge = await authApi.createNonce(address);
+      if (!nonceChallenge.message) {
         throw new Error("Invalid message received from server.");
       }
 
-      // 2. Ask user to sign message
-      const signature = await signMessageAsync({ message: messageString });
+      // 2. Ask user to sign the exact SIWE message
+      const signature = await signMessageAsync({ message: nonceChallenge.message });
 
-      // 3. Verify signature to backend
-      const loginRes = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/auth/login`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ signature }),
-        },
-      );
+      // 3. Verify signature to backend (POST /auth/verify with message and signature)
+      const data = await authApi.verifySignature(nonceChallenge.message, signature);
 
-      if (!loginRes.ok) {
-        const errorData = await loginRes.json();
-        throw new Error(errorData.message || "Login failed. Please try again.");
-      }
-
-      // 4. save access token to local storage
-      const data = await loginRes.json();
+      // 4. Save access token to local storage
       localStorage.setItem("etherdoc-auth", data.accessToken);
       console.info(`accessToken: ${data.accessToken}`);
 

@@ -3,6 +3,8 @@
 import { useState, type ChangeEvent, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useAccount } from "wagmi";
+import { documentsApi } from "@/lib/api";
 
 type SearchResult = {
   id: string;
@@ -53,6 +55,7 @@ const UploadIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 export default function SearchPage() {
   const router = useRouter();
+  const { address } = useAccount();
 
   // State for UI
   const [activeTab, setActiveTab] = useState<"search" | "upload">("search");
@@ -83,42 +86,22 @@ export default function SearchPage() {
     try {
       const formData = new FormData();
       formData.append("file", selectedFile);
-
-      const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
-      const url = `${API_BASE_URL}/documents/search`;
-
-      // send request to API
-      const response = await fetch(url, {
-        method: "POST",
-        body: formData,
-      });
-
-      if (response.ok) {
-        const document = await response.json();
-
-        // Redirect to document detail page
-        router.push(`/document/${document.cid}`);
-      } else {
-        // Error handling
-        if (response.status === 404) {
-          setError(
-            "This document was not found in our system. It might not be registered",
-          );
-        } else if (response.status === 422) {
-          setError("File is too large. The maximum allowed size is 5MB");
-        } else {
-          const errorData = await response.json().catch(() => ({
-            message: "An unexpected error occured while verifying the file.",
-          }));
-          setError(errorData.message);
-        }
-        setSearchResult(null);
+      if (address) {
+        formData.append("issuer", address);
       }
-    } catch (error) {
+
+      const verification = await documentsApi.searchByFile(formData);
+      if (verification && verification.document?.documentId) {
+        router.push(`/document/${verification.document.documentId}`);
+      } else {
+        throw new Error("Verification response did not return a valid document identity.");
+      }
+    } catch (error: unknown) {
       console.error("File upload error: ", error);
       setError(
-        "Failed to connect to the server. Please check your connection and try again.",
+        error instanceof Error ? error.message : "Failed to verify file.",
       );
+      setSearchResult(null);
     } finally {
       setIsLoading(false);
     }
@@ -133,47 +116,19 @@ export default function SearchPage() {
       resetState();
 
       try {
-        const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
-        const url = `${API_BASE_URL}/documents/${searchQuery}?network=private`;
-
-        console.info("Requesting URL: ", url);
-
-        const response = await fetch(url, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-
-        // Handle response
-        if (response.ok) {
-          const result = await response.json();
-          const document = result.data;
-
-          // Redirect to document detail page
-          router.push(`/document/${document.id}`);
+        const targetId = searchQuery.trim();
+        const verification = await documentsApi.getVerifiedDocument(targetId);
+        if (verification && verification.document?.documentId) {
+          router.push(`/document/${verification.document.documentId}`);
         } else {
-          // Handle errors based on status code
-          if (response.status === 404) {
-            setError("Document with that ID was not found on the blockchain.");
-          } else {
-            const errorData = await response.json().catch(() => {
-              return { message: "An unexpected error occured." };
-            });
-
-            setError(errorData.message || `Error: ${response.statusText}`);
-          }
-
-          // Reset search result if error occurs
-          setSearchResult(null);
+          throw new Error("Document not found");
         }
-
-        console.info("API Response Status: ", response.status);
-      } catch (error) {
+      } catch (error: unknown) {
         console.error("Fetch error: ", error);
         setError(
-          "Failed to connect to the server. Please check your connection.",
+          error instanceof Error ? error.message : "Document search failed.",
         );
+        setSearchResult(null);
       } finally {
         setIsLoading(false);
       }

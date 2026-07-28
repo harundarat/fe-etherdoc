@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { documentsApi } from "@/lib/api";
+import { StorageNetwork } from "@/lib/types/api";
 
 interface ApiFile {
   id: string;
@@ -15,12 +17,6 @@ interface ApiFile {
   created_at: string;
 }
 
-interface ApiResponse {
-  data: {
-    files: ApiFile[];
-    next_page_token: string | null;
-  };
-}
 
 interface DocumentsContentProps {
   onUploadClick: () => void;
@@ -118,60 +114,19 @@ export default function DocumentsContent({
     }
   }, [refreshTrigger, activeTab]);
 
-  const fetchDocuments = async (networkType: string = "public") => {
+  const fetchDocuments = async (networkType: string = "private") => {
     setIsLoading(true);
     setError(null);
 
     try {
-      const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+      const net = (networkType === "public" ? "public" : "private") as StorageNetwork;
+      const result = await documentsApi.listStoredFiles(net);
+      console.log("API Response:", result);
 
-      // Get token from localStorage
-      const token = localStorage.getItem("etherdoc-auth");
-
-      console.log("API_BASE_URL:", API_BASE_URL); // Debug log
-      console.log("Network Type:", networkType); // Debug log
-      console.log(`Full URL: ${API_BASE_URL}/documents?network=${networkType}`); // Debug log
-
-      // Fetch data
-      const headers: Record<string, string> = {
-        "Content-Type": "application/json",
-      };
-      if (token) {
-        headers["Authorization"] = `Bearer ${token}`;
-      }
-      const response = await fetch(
-        `${API_BASE_URL}/documents?network=${networkType}`,
-        {
-          method: "GET",
-          headers,
-          credentials: "include",
-          mode: "cors",
-        },
-      );
-
-      console.log("Response status:", response.status); // Debug log
-      console.log("Response ok:", response.ok); // Debug log
-
-      if (!response.ok) {
-        if (response.status === 401 || response.status === 403) {
-          setError("Unauthorized. Please login again.");
-        } else {
-          const errorData = await response
-            .json()
-            .catch(() => ({ message: "Failed to parse error response" }));
-          setError(
-            errorData.message || `HTTP error! status: ${response.status}`,
-          );
-        }
-        setApiDocuments([]);
-        return;
-      }
-
-      const result: ApiResponse = await response.json();
-      console.log("API Response:", result); // Debug log
-      setApiDocuments(result.data.files);
+      const filesList = result.data?.files || result.files || [];
+      setApiDocuments(filesList as ApiFile[]);
     } catch (error: unknown) {
-      console.error("Failed to fetch documents; ", error);
+      console.error("Failed to fetch documents:", error);
       setError(
         error instanceof Error ? error.message : "Unknown error occurred",
       );
