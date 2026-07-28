@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAccount, useSignMessage } from "wagmi";
+import { useAccount, useAccountEffect, useSignMessage } from "wagmi";
 import { useAppKit } from "@reown/appkit/react";
+import type { Address } from "viem";
 import { authApi } from "@/lib/api";
 
 export default function LoginPage() {
@@ -15,51 +16,59 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleLogin = async () => {
+  const authenticate = useCallback(
+    async (walletAddress: Address) => {
+      setIsLoading(true);
+      setError(null);
+
+      try {
+        // 1. Get SIWE challenge nonce from server (POST /auth/nonce with address)
+        const nonceChallenge = await authApi.createNonce(walletAddress);
+        if (!nonceChallenge.message) {
+          throw new Error("Invalid message received from server.");
+        }
+
+        // 2. Ask user to sign the exact SIWE message
+        const signature = await signMessageAsync({
+          message: nonceChallenge.message,
+        });
+
+        // 3. Verify signature to backend (POST /auth/verify with message and signature)
+        const data = await authApi.verifySignature(
+          nonceChallenge.message,
+          signature,
+        );
+
+        // 4. Save access token to local storage
+        localStorage.setItem("etherdoc-auth", data.accessToken);
+
+        // 5. Redirect to dashboard
+        router.push("/dashboard");
+      } catch (err: unknown) {
+        console.error("Authentication error:", err);
+        setError(
+          err instanceof Error ? err.message : "An unexpected error occurred.",
+        );
+        setIsLoading(false);
+      }
+    },
+    [router, signMessageAsync],
+  );
+
+  useAccountEffect({
+    onConnect({ address: connectedAddress }) {
+      void authenticate(connectedAddress);
+    },
+  });
+
+  const handleLogin = () => {
     if (!isConnected || !address) {
-      // Jika belum terhubung, buka modal koneksi wallet
       open();
       return;
     }
 
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      // 1. Get SIWE challenge nonce from server (POST /auth/nonce with address)
-      const nonceChallenge = await authApi.createNonce(address);
-      if (!nonceChallenge.message) {
-        throw new Error("Invalid message received from server.");
-      }
-
-      // 2. Ask user to sign the exact SIWE message
-      const signature = await signMessageAsync({ message: nonceChallenge.message });
-
-      // 3. Verify signature to backend (POST /auth/verify with message and signature)
-      const data = await authApi.verifySignature(nonceChallenge.message, signature);
-
-      // 4. Save access token to local storage
-      localStorage.setItem("etherdoc-auth", data.accessToken);
-      console.info(`accessToken: ${data.accessToken}`);
-
-      // 5. Redirect to dashboard
-      router.push("/dashboard");
-    } catch (err: unknown) {
-      console.error("Authentication error:", err);
-      setError(
-        err instanceof Error ? err.message : "An unexpected error occurred.",
-      );
-      setIsLoading(false);
-    }
+    void authenticate(address);
   };
-
-  // When wallet connected, try login
-  useEffect(() => {
-    if (isConnected && address) {
-      handleLogin();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isConnected, address]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 relative overflow-hidden">

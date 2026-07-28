@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
 import { documentsApi } from "@/lib/api";
-import { StorageNetwork } from "@/lib/types/api";
+import type { StorageNetwork } from "@/lib/types/api";
 
 interface ApiFile {
   id: string;
@@ -87,12 +88,23 @@ export default function DocumentsContent({
 
   const router = useRouter();
 
-  const [activeTab, setActiveTab] = useState("all");
+  const [activeTab, setActiveTab] = useState<"all" | StorageNetwork>("all");
   const [searchQuery, setSearchQuery] = useState("");
 
-  const [apiDocuments, setApiDocuments] = useState<ApiFile[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const storageNetwork: StorageNetwork =
+    activeTab === "public" ? "public" : "private";
+  const {
+    data: apiDocuments = [],
+    error: documentsError,
+    isLoading,
+  } = useQuery<ApiFile[], Error>({
+    queryKey: ["documents", storageNetwork, refreshTrigger],
+    queryFn: async () => {
+      const result = await documentsApi.listStoredFiles(storageNetwork);
+      return (result.data?.files || result.files || []) as ApiFile[];
+    },
+  });
+  const error = documentsError?.message ?? null;
 
   // Stats calculations
   const totalDocuments = apiDocuments.length;
@@ -103,38 +115,6 @@ export default function DocumentsContent({
     weekAgo.setDate(weekAgo.getDate() - 7);
     return docDate >= weekAgo;
   }).length;
-
-  useEffect(() => {
-    fetchDocuments("private");
-  }, []);
-
-  useEffect(() => {
-    if (refreshTrigger) {
-      fetchDocuments(activeTab === "public" ? "public" : "private");
-    }
-  }, [refreshTrigger, activeTab]);
-
-  const fetchDocuments = async (networkType: string = "private") => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const net = (networkType === "public" ? "public" : "private") as StorageNetwork;
-      const result = await documentsApi.listStoredFiles(net);
-      console.log("API Response:", result);
-
-      const filesList = result.data?.files || result.files || [];
-      setApiDocuments(filesList as ApiFile[]);
-    } catch (error: unknown) {
-      console.error("Failed to fetch documents:", error);
-      setError(
-        error instanceof Error ? error.message : "Unknown error occurred",
-      );
-      setApiDocuments([]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const filteredDocuments = apiDocuments.filter((doc) =>
     doc.name.toLowerCase().includes(searchQuery.toLowerCase()),
@@ -274,15 +254,7 @@ export default function DocumentsContent({
               <button
                 key={tab.id}
                 onClick={() => {
-                  setActiveTab(tab.id);
-                  // Call fetchDocuments
-                  if (tab.id === "public") {
-                    fetchDocuments("public");
-                  } else if (tab.id === "private") {
-                    fetchDocuments("private");
-                  } else {
-                    fetchDocuments("private");
-                  }
+                  setActiveTab(tab.id as "all" | StorageNetwork);
                 }}
                 className={`flex items-center gap-2 px-6 py-3 rounded-xl font-medium text-sm transition-all duration-300 ${
                   activeTab === tab.id
